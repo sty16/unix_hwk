@@ -63,7 +63,7 @@ public:
         return ans;
     }
 
-    vector<int> getPersonWithinPlace(vector<Point>& base_station, vector<int>& infected_person, Point pos, string date) {
+    vector<int> getPersonWithinPlace(vector<Point>& base_station, vector<int>& infected_person, Point pos, string date, double range) {
         simulation(base_station, infected_person, date);
         string time = "23:59";
         int t = time2int(date, time);
@@ -73,7 +73,7 @@ public:
                 int tmp = time2int(track.date, track.time);
                 if(tmp < t && t - tmp < 1440) {
                     Point cur(track.x, track.y);
-                    if(distance(cur, pos) < 1.0) {
+                    if(distance(cur, pos) < range) {
                         ans.push_back(id);
                         break;
                     }
@@ -90,7 +90,6 @@ public:
         string start_time = "00:00";
 
         double threshold = 0.5;
-
         infected.clear();
         infected.insert(infected_person.begin(), infected_person.end());
         vector<Point> dangerPos;
@@ -99,7 +98,6 @@ public:
 
         for(int k = begin; k < end; k += 180) {
             // 记录感染的人去过的位置
-
             for(int id : infected) {
                 for(auto track : mp[id]) {
                     int t = time2int(track.date, track.time);
@@ -184,19 +182,21 @@ public:
 int main() {
     Solution so;
     so.readDataFromFile("data.txt");
-    string date = "2020-09-06";
-    Point pos(191.7, 121.4);
-    vector<int> initial_infected = {1, 2, 3, 5, 6, 23, 26, 56, 10, 100, 12, 14,15};
-    vector<Point> base_station;
+    string date = "2020-09-26";
+    int id = 0;
+    Point pos(100.0, 100.0); // 查询位置
+    vector<int> initial_infected = {1, 2, 3, 5, 6, 10, 12, 14, 15, 23, 26, 56, 100}; // 初始感染人id
+    vector<Point> base_station;  // 基站位置
     base_station.emplace_back(10, 10);
-
-
-    vector<Track> track = so.getPersonTrack(0, date);
-    vector<int> infected = so.getPersonWithinPlace(base_station, initial_infected , pos, date);
+    double range = 30; // 查找范围为20km的感染人数， 1km导致人数过少
+    vector<Track> track = so.getPersonTrack(id, date);
+    vector<int> infected = so.getPersonWithinPlace(base_station, initial_infected , pos, date, range);
+    cout << "id：" << id << "日期：" << date << " 14天内活动轨迹" << endl;
     for(auto t : track) {
         cout << t.id << " " << t.x << " " << t.y << " " << t.date <<" " << t.time << endl; 
     }
-    cout << "感染人id" << endl;
+    cout <<"截止日期" << date << " 位置: " <<pos.x <<" "<< pos.y << " 范围" << range << "Km"<<  " 感染人id" << endl;
+    sort(infected.begin(), infected.end());
     for(int id : infected) {
         cout << id << endl;
     }
