@@ -70,6 +70,7 @@ public :
 
 
 int main() {
+    // 采用深度优先搜索的方式 寻找最短
     Solution so;
     vector<node> ans = so.findMinOperations(8, 5, 3);
     for(auto tmp : ans) {
