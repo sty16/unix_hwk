@@ -3,6 +3,10 @@
 #include<unistd.h>
 #include<sys/stat.h>
 #include<errno.h>
+#include <sys/wait.h>
+#include <signal.h>
+#include<sys/ipc.h>
+#include<sys/shm.h>
 
 //执行方式 ./test test.csv out
 int main(int argc, char *argv[]) {
@@ -18,6 +22,14 @@ int main(int argc, char *argv[]) {
     char buffer[4096];
     int  bigEndian[4096];
     int offset = 8;
+    int shmid;
+    char *shm_addr;
+    if((shmid = shmget(11, 4096, 0666 | IPC_CREAT)) < 0)
+    {
+       perror("shmget");
+       exit(1);
+    }
+    
     ssize_t r_size, w_size;
     do {
         r_size = read(infile, buffer, 4096);
